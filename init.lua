@@ -61,6 +61,7 @@ require('lazy').setup({
   -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    event = 'VeryLazy',
     opts = {
       signs = {
         add = { text = '+' },
@@ -92,10 +93,11 @@ require('lazy').setup({
   require 'twfksh.plugins.colors',
 
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  { 'folke/todo-comments.nvim', event = 'VeryLazy', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   require 'twfksh.plugins.mini-plugins',
   require 'twfksh.plugins.treesitter',
+  require 'twfksh.plugins.better-escape',
 
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
