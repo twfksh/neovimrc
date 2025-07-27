@@ -38,7 +38,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
           preview_cutoff = 120,
         },
         -- Appearance
-        borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+        -- borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
         use_less = true,
         path_display = { 'truncate' },
         -- winblend = 10, -- Transparency
