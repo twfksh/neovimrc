@@ -31,7 +31,10 @@ return { -- Collection of various small independent plugins/modules
       return '%2l:%-2v'
     end
 
-    -- ... and there is more!
-    --  Check out: https://github.com/echasnovski/mini.nvim
+    -- File explorer
+    require('mini.files').setup()
+    vim.keymap.set('n', '-', function()
+      MiniFiles.open()
+    end, { desc = 'Open mini files' })
   end,
 }
