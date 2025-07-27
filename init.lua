@@ -25,6 +25,8 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   require 'twfksh.plugins.guess-indent',
   require 'twfksh.plugins.todo-comments',
+  require 'twfksh.plugins.flash',
+  require 'twfksh.plugins.smear-cursor',
 
   require 'twfksh.plugins.gitsigns',
   require 'twfksh.plugins.which-key',
@@ -39,7 +41,8 @@ require('lazy').setup({
   require 'twfksh.plugins.autopairs',
 
   require 'twfksh.plugins.debugger',
-  -- require 'twfksh.plugins.lint',
+  require 'twfksh.plugins.vim-test',
+  -- require 'twfksh.plugins.linter',
 }, {
   performance = {
     rtp = {

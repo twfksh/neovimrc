@@ -40,5 +40,7 @@ return { -- Collection of various small independent plugins/modules
     vim.keymap.set('n', '-', function()
       MiniFiles.open()
     end, { desc = 'Open mini files' })
+
+    require('mini.indentscope').setup() -- Indent line
   end,
 }
