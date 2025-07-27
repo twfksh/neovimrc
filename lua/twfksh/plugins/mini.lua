@@ -32,7 +32,11 @@ return { -- Collection of various small independent plugins/modules
     end
 
     -- File explorer
-    require('mini.files').setup()
+    require('mini.files').setup {
+      windows = {
+        width_focus = 25,
+      },
+    }
     vim.keymap.set('n', '-', function()
       MiniFiles.open()
     end, { desc = 'Open mini files' })

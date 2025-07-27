@@ -23,8 +23,8 @@ rtp:prepend(lazypath)
 
 -- [[ Configure and install plugins ]]
 require('lazy').setup({
-  'NMAC427/guess-indent.nvim',
-  { 'folke/todo-comments.nvim', event = 'VeryLazy', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  require 'twfksh.plugins.guess-indent',
+  require 'twfksh.plugins.todo-comments',
 
   require 'twfksh.plugins.gitsigns',
   require 'twfksh.plugins.which-key',
@@ -36,12 +36,11 @@ require('lazy').setup({
   require 'twfksh.plugins.treesitter',
   require 'twfksh.plugins.better-escape',
 
-  -- require 'kickstart.plugins.debug',
+  require 'twfksh.plugins.autopairs',
+
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 }, {
   performance = {
     rtp = {
