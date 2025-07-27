@@ -40,10 +40,6 @@ return {
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
-          -- Few helper functions
-          map('<leader>i', '<cmd>LspInfo<cr>', 'LspInfo')
-          map('<leader>I', '<cmd>LspInstall<cr>', 'LspIntall')
-
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
           ---@param method vim.lsp.protocol.Method
@@ -160,6 +156,10 @@ return {
           end,
         },
       }
+
+      -- Few helper functions
+      vim.keymap.set('n', '<leader>i', '<cmd>LspInfo<cr>', { desc = 'LSP: LspInfo' })
+      vim.keymap.set('n', '<leader>I', '<cmd>LspInstall<cr>', { desc = 'LSP: LspInstall' })
     end,
   },
   { -- Autoformat
