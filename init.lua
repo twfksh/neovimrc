@@ -34,6 +34,8 @@ require('lazy').setup({
   require 'twfksh.plugins.which-key',
   require 'twfksh.plugins.telescope',
   require 'twfksh.plugins.lspconfig',
+  require 'twfksh.plugins.copilot',
+
   require 'twfksh.plugins.colors',
 
   require 'twfksh.plugins.mini',
