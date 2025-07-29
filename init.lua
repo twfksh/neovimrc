@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -35,6 +37,7 @@ require('lazy').setup({
   require 'twfksh.plugins.colors',
 
   require 'twfksh.plugins.mini',
+  require 'twfksh.plugins.lualine',
   require 'twfksh.plugins.treesitter',
   require 'twfksh.plugins.better-escape',
 
@@ -45,6 +48,8 @@ require('lazy').setup({
   -- require 'twfksh.plugins.linter',
 
   require 'twfksh.plugins.uv',
+
+  require 'twfksh.plugins.markview',
 }, {
   performance = {
     rtp = {
