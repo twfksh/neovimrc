@@ -47,7 +47,7 @@ require('lazy').setup({
 
   require 'twfksh.plugins.debugger',
   require 'twfksh.plugins.vim-test',
-  -- require 'twfksh.plugins.linter',
+  require 'twfksh.plugins.linter',
 
   require 'twfksh.plugins.uv',
 
