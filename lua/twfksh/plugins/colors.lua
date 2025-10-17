@@ -16,4 +16,25 @@ return {
   { 'navarasu/onedark.nvim', lazy = false, priority = 1000, opts = {} },
   { 'lunarvim/darkplus.nvim', lazy = false, priority = 1000, opts = {} },
   { 'bluz71/vim-nightfly-colors', name = 'nightfly', lazy = false, priority = 1000 },
+  { 'rebelot/kanagawa.nvim', lazy = false, priority = 1000 },
+  {
+    'zenbones-theme/zenbones.nvim',
+    dependencies = 'rktjmp/lush.nvim',
+    lazy = false,
+    priority = 1000,
+    -- config = function()
+    --     vim.g.zenbones_darken_comments = 45
+    --     vim.cmd.colorscheme('zenbones')
+    -- end
+  },
+  {
+    'vague-theme/vague.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- NOTE: you do not need to call setup if you don't want to.
+      require('vague').setup {}
+      -- vim.cmd 'colorscheme vague'
+    end,
+  },
 }
