@@ -26,14 +26,14 @@ return { -- Collection of various small independent plugins/modules
     -- end
 
     -- File explorer
-    require('mini.files').setup {
-      windows = {
-        width_focus = 25,
-      },
-    }
-    vim.keymap.set('n', '-', function()
-      MiniFiles.open()
-    end, { desc = 'Open mini files' })
+    -- require('mini.files').setup {
+    --   windows = {
+    --     width_focus = 25,
+    --   },
+    -- }
+    -- vim.keymap.set('n', '-', function()
+    --   MiniFiles.open()
+    -- end, { desc = 'Open mini files' })
 
     require('mini.indentscope').setup() -- Indent line
     require 'mini.base16' -- base16 colors

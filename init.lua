@@ -39,6 +39,7 @@ require('lazy').setup({
   require 'twfksh.plugins.colors',
 
   require 'twfksh.plugins.mini',
+  require 'twfksh.plugins.oil',
   require 'twfksh.plugins.lualine',
   require 'twfksh.plugins.treesitter',
   require 'twfksh.plugins.better-escape',
@@ -52,6 +53,7 @@ require('lazy').setup({
   require 'twfksh.plugins.uv',
 
   require 'twfksh.plugins.markview',
+  require 'twfksh.plugins.transparent',
 }, {
   performance = {
     rtp = {

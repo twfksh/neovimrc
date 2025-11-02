@@ -37,4 +37,7 @@ return {
       -- vim.cmd 'colorscheme vague'
     end,
   },
+  { 'rose-pine/neovim', name = 'rose-pine' },
+  { 'sainnhe/gruvbox-material' },
+  { 'sainnhe/everforest' },
 }
