@@ -5,6 +5,9 @@ return { -- Useful plugin to show you pending keybinds.
     preset = 'helix',
     delay = 0,
     icons = {},
+    win = {
+      border = 'single',
+    },
     -- Document existing key chains
     spec = {
       { '<leader>s', group = '[S]earch' },

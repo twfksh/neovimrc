@@ -40,7 +40,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
         },
         sorting_strategy = 'ascending',
         -- Appearance
-        -- borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+        borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
         use_less = true,
         path_display = { 'truncate' },
         winblend = 10, -- Transparency
