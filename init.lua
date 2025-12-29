@@ -22,6 +22,8 @@ vim.opt.ignorecase = true
 vim.opt.termguicolors = true
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.stdpath 'data' .. '/undodir'
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
 vim.g.mapleader = ' '
 
@@ -41,6 +43,7 @@ vim.pack.add({
     'https://github.com/ibhagwan/fzf-lua',
     'https://github.com/folke/flash.nvim',
     'https://github.com/chomosuke/typst-preview.nvim',
+    'https://github.com/dstein64/vim-startuptime',
 }, { confirm = false })
 
 vim.cmd [[colorscheme vague]]
