@@ -72,6 +72,32 @@ local lsp_servers = {
     lua_ls = { Lua = { workspace = { library = vim.api.nvim_get_runtime_file('lua', true) } } },
 }
 
+---Utility for keymap creation.
+---@param lhs string
+---@param rhs string|function
+---@param opts string|table
+---@param mode? string|string[]
+---@param bufnr? integer
+local function keymap(lhs, rhs, opts, mode, bufnr)
+    opts = type(opts) == 'string' and { desc = opts } or vim.tbl_extend('error', opts --[[@as table]], { buffer = bufnr })
+    mode = mode or 'n'
+    vim.keymap.set(mode, lhs, rhs, opts)
+end
+
+require('fzf-lua').setup {
+    winopts = {
+        border = 'single',
+        preview = {
+            border = 'single',
+        },
+    },
+}
+
+keymap('<leader>ff', ':FzfLua files<cr>', {})
+keymap('<leader>f.', ':FzfLua buffers<cr>', {})
+keymap('<leader>fg', ':FzfLua grep<cr>', {})
+keymap('<leader>fm', ':FzfLua marks<cr>', {})
+
 require('mason').setup()
 require('mason-lspconfig').setup()
 require('mason-tool-installer').setup {
@@ -83,7 +109,8 @@ for server, config in pairs(lsp_servers) do
         settings = config,
 
         on_attach = function(_, bufnr)
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = bufnr })
+            keymap('gA', ':FzfLua lsp_code_actions<cr>', { silent = true }, 'n', bufnr)
+            keymap('gd', ':FzfLua lsp_definitions<cr>', {}, 'n', bufnr)
         end,
     })
 end
@@ -106,17 +133,6 @@ require('conform').setup {
     },
 }
 
----Utility for keymap creation.
----@param lhs string
----@param rhs string|function
----@param opts string|table
----@param mode? string|string[]
-local function keymap(lhs, rhs, opts, mode, bufnr)
-    opts = type(opts) == 'string' and { desc = opts } or vim.tbl_extend('error', opts --[[@as table]], { buffer = bufnr })
-    mode = mode or 'n'
-    vim.keymap.set(mode, lhs, rhs, opts)
-end
-
 vim.diagnostic.config {
     virtual_text = false,
 }
@@ -124,19 +140,6 @@ vim.diagnostic.config {
 keymap('<leader>e', function()
     vim.diagnostic.open_float(nil, { focus = false })
 end, {})
-
-require('fzf-lua').setup {
-    winopts = {
-        border = 'single',
-        preview = {
-            border = 'single',
-        },
-    },
-}
-keymap('<leader>ff', ':FzfLua files<cr>', {})
-keymap('<leader>f.', ':FzfLua buffers<cr>', {})
-keymap('<leader>fg', ':FzfLua grep<cr>', {})
-keymap('<leader>fm', ':FzfLua marks<cr>', {})
 
 require('flash').setup {}
 keymap('s', function()
