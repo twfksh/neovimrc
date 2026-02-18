@@ -50,7 +50,7 @@ vim.pack.add({
     'https://github.com/mason-org/mason.nvim',
     'https://github.com/mason-org/mason-lspconfig.nvim',
     'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim',
-    { src = gh('saghen/blink.cmp'), version = 'v1.9.1' },
+    { src = gh('saghen/blink.cmp'), version = vim.version.range '^v1.*' },
     'https://github.com/ibhagwan/fzf-lua',
     'https://github.com/folke/flash.nvim',
     'https://github.com/chomosuke/typst-preview.nvim',
@@ -87,7 +87,7 @@ require('mason-tool-installer').setup {
     ensure_installed = vim.tbl_keys(lsp_servers),
 }
 require('blink.cmp').setup({
-    keymap = { preset = 'default' },
+    keymap = { preset = 'super-tab' },
     appearance = {
         nerd_font_variant = 'mono'
     },
