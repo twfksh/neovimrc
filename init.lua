@@ -7,7 +7,7 @@ local keymap = require('utils').keymap
 keymap(';', ':', {})
 keymap('jk', '<Esc>', {}, 'i')
 keymap('-', ':Ex<cr>', {})
-keymap('<Esc>', ':nohlsearch<cr>', {})
+keymap('<Esc>', '<cmd>nohlsearch<cr>', {})
 
 vim.cmd [[set mouse=]]
 vim.cmd [[set noswapfile]]
@@ -19,6 +19,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.winborder = 'single'
 vim.opt.expandtab = true
+vim.opt.laststatus = 3
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
@@ -35,6 +36,9 @@ vim.opt.splitbelow = true
 
 vim.g.mapleader = ' '
 
+local gh = function(x) return 'https://github.com/' .. x end
+local cb = function(x) return 'https://codeberg.org/' .. x end
+
 vim.pack.add({
     'https://github.com/vague2k/vague.nvim',
     'https://github.com/itchyny/lightline.vim',
@@ -46,6 +50,7 @@ vim.pack.add({
     'https://github.com/mason-org/mason.nvim',
     'https://github.com/mason-org/mason-lspconfig.nvim',
     'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim',
+    { src = gh('saghen/blink.cmp'), version = 'v1.9.1' },
     'https://github.com/ibhagwan/fzf-lua',
     'https://github.com/folke/flash.nvim',
     'https://github.com/chomosuke/typst-preview.nvim',
@@ -73,19 +78,6 @@ require('gitsigns').setup {
 
 require('nvim-treesitter').install { 'all' }
 
-require('fzf-lua').setup {
-    winopts = {
-        border = 'single',
-        preview = {
-            border = 'single',
-        },
-    },
-}
-keymap('<leader>ff', ':FzfLua files<cr>', {})
-keymap('<leader>f.', ':FzfLua buffers<cr>', {})
-keymap('<leader>fg', ':FzfLua grep<cr>', {})
-keymap('<leader>fm', ':FzfLua marks<cr>', {})
-
 local lsp_servers = {
     lua_ls = { Lua = { workspace = { library = vim.api.nvim_get_runtime_file('lua', true) } } },
 }
@@ -94,6 +86,36 @@ require('mason-lspconfig').setup()
 require('mason-tool-installer').setup {
     ensure_installed = vim.tbl_keys(lsp_servers),
 }
+require('blink.cmp').setup({
+    keymap = { preset = 'default' },
+    appearance = {
+        nerd_font_variant = 'mono'
+    },
+    completion = {
+        documentation = { auto_show = false }
+    },
+    sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+    },
+})
+
+require('fzf-lua').setup {
+    winopts = {
+        border = 'single',
+        preview = {
+            border = 'single',
+        },
+    },
+}
+require('fzf-lua').register_ui_select {}
+
+keymap('<leader>ff', ':FzfLua files<cr>', {})
+keymap('<leader>f.', ':FzfLua buffers<cr>', {})
+keymap('<leader>frg', ':FzfLua grep_curbuf<cr>', {})
+keymap('<leader>fg', ':FzfLua lgrep_curbuf<cr>', {})
+keymap('<leader>fm', ':FzfLua marks<cr>', {})
+keymap('<leader>fdd', ':FzfLua diagnostics_document<cr>', {})
+keymap('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', {})
 
 vim.diagnostic.config {
     virtual_text = false,
