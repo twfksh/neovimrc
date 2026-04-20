@@ -1,59 +1,64 @@
 if vim.loader then
     vim.loader.enable()
 end
+require('vim._core.ui2').enable({})
 
-local keymap = require('utils').keymap
-
-keymap(';', ':', {})
-keymap('jk', '<Esc>', {}, 'i')
-keymap('-', ':Ex<cr>', {})
-keymap('<Esc>', '<cmd>nohlsearch<cr>', {})
-
-vim.cmd [[set mouse=]]
-vim.cmd [[set noswapfile]]
-vim.cmd [[syntax on]]
-vim.cmd [[filetype plugin indent on]]
-vim.cmd [[hi @lsp.type.number gui=italic]]
+vim.api.nvim_set_hl(0, '@lsp.type.number', { italic = true })
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.winborder = 'single'
-vim.opt.expandtab = true
 vim.opt.laststatus = 3
+vim.opt.termguicolors = true
+vim.opt.winborder = 'single'
+vim.opt.signcolumn = 'yes'
+vim.opt.cursorline = true
+vim.opt.scrolloff = 8
+vim.opt.expandtab = true
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.smartindent = true
-vim.opt.signcolumn = 'yes'
-vim.opt.cursorline = true
 vim.opt.wrap = false
 vim.opt.ignorecase = true
-vim.opt.termguicolors = true
+vim.opt.smartcase = true
+local undodir = vim.fn.stdpath 'data' .. '/undodir'
+if vim.fn.isdirectory(undodir) == 0 then
+    vim.fn.mkdir(undodir, 'p')
+end
+vim.opt.undodir = undodir
 vim.opt.undofile = true
-vim.opt.undodir = vim.fn.stdpath 'data' .. '/undodir'
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
 vim.g.mapleader = ' '
+vim.g.maplocalleader = '\\'
+
+local bind = require('utils').bind
+
+bind(';', ':', {})
+bind('-', ':Ex<cr>', {})
+bind('jk', '<Esc>', {}, 'i')
+bind('<Esc>', '<cmd>nohlsearch<cr>', {})
 
 local gh = function(x) return 'https://github.com/' .. x end
 local cb = function(x) return 'https://codeberg.org/' .. x end
 
 vim.pack.add({
-    'https://github.com/vague2k/vague.nvim',
-    'https://github.com/itchyny/lightline.vim',
-    'https://github.com/chentoast/marks.nvim',
-    'https://github.com/nvim-mini/mini.pairs',
-    'https://github.com/lewis6991/gitsigns.nvim',
-    'https://github.com/nvim-treesitter/nvim-treesitter',
-    'https://github.com/neovim/nvim-lspconfig',
-    'https://github.com/mason-org/mason.nvim',
-    'https://github.com/mason-org/mason-lspconfig.nvim',
-    'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim',
+    gh('vague2k/vague.nvim'),
+    gh('itchyny/lightline.vim'),
+    gh('chentoast/marks.nvim'),
+    gh('nvim-mini/mini.pairs'),
+    gh('lewis6991/gitsigns.nvim'),
+    -- gh('arborist-ts/arborist.nvim'),
+    gh('neovim/nvim-lspconfig'),
+    gh('mason-org/mason.nvim'),
+    gh('mason-org/mason-lspconfig.nvim'),
+    gh('WhoIsSethDaniel/mason-tool-installer.nvim'),
     { src = gh('saghen/blink.cmp'), version = vim.version.range '^v1.*' },
-    'https://github.com/ibhagwan/fzf-lua',
-    'https://github.com/folke/flash.nvim',
-    'https://github.com/chomosuke/typst-preview.nvim',
+    gh('ibhagwan/fzf-lua'),
+    gh('folke/flash.nvim'),
+    gh('chomosuke/typst-preview.nvim'),
+    cb('mfussenegger/nvim-dap'),
 }, { confirm = false })
 
 vim.cmd [[colorscheme vague]]
@@ -75,8 +80,6 @@ require('gitsigns').setup {
         delay = 250,
     },
 }
-
-require('nvim-treesitter').install { 'all' }
 
 local lsp_servers = {
     lua_ls = { Lua = { workspace = { library = vim.api.nvim_get_runtime_file('lua', true) } } },
@@ -109,25 +112,17 @@ require('fzf-lua').setup {
 }
 require('fzf-lua').register_ui_select {}
 
-keymap('<leader>ff', ':FzfLua files<cr>', {})
-keymap('<leader>f.', ':FzfLua buffers<cr>', {})
-keymap('<leader>frg', ':FzfLua grep_curbuf<cr>', {})
-keymap('<leader>fg', ':FzfLua lgrep_curbuf<cr>', {})
-keymap('<leader>fm', ':FzfLua marks<cr>', {})
-keymap('<leader>fdd', ':FzfLua diagnostics_document<cr>', {})
-keymap('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', {})
+bind('<leader>ff', ':FzfLua files<cr>', {})
+bind('<leader>f.', ':FzfLua buffers<cr>', {})
+bind('<leader>frg', ':FzfLua grep_curbuf<cr>', {})
+bind('<leader>fg', ':FzfLua lgrep_curbuf<cr>', {})
+bind('<leader>fm', ':FzfLua marks<cr>', {})
+bind('<leader>fdd', ':FzfLua diagnostics_document<cr>', {})
+bind('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', {})
 
-vim.diagnostic.config {
-    virtual_text = false,
-}
-keymap('<leader>e', function()
-    vim.diagnostic.open_float(nil, { focus = false })
-end, {})
+vim.diagnostic.config { virtual_text = false }
+bind('<leader>e', function() vim.diagnostic.open_float(nil, { focus = false }) end, {})
 
 require('flash').setup {}
-keymap('s', function()
-    require('flash').jump()
-end, { desc = 'flash' }, { 'n', 'x', 'o' })
-keymap('<c-s>', function()
-    require('flash').toggle()
-end, { desc = 'toggle flash' }, 'c')
+bind('s', function() require('flash').jump() end, { desc = 'flash' }, { 'n', 'x', 'o' })
+bind('<c-s>', function() require('flash').toggle() end, { desc = 'toggle flash' }, 'c')

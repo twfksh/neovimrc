@@ -1,4 +1,4 @@
-local keymap = require('utils').keymap
+local bind = require('utils').bind
 
 vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (copying) text',
@@ -28,21 +28,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(args)
         local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
         if client:supports_method 'textDocument/definition' then
-            keymap('gd', vim.lsp.buf.definition, {})
+            bind('gd', vim.lsp.buf.definition, {})
         end
         if client:supports_method 'textDocument/declaration' then
-            keymap('gD', vim.lsp.buf.declaration, {})
+            bind('gD', vim.lsp.buf.declaration, {})
         end
         if client:supports_method 'textDocument/implementation' then
-            keymap('gI', vim.lsp.buf.implementation, {})
+            bind('gI', vim.lsp.buf.implementation, {})
         end
-        -- Enable auto-completion. Note: Use CTRL-Y to select an item. |complete_CTRL-Y|
-        -- if client:supports_method 'textDocument/completion' then
-        --     -- Optional: trigger autocompletion on EVERY keypress. May be slow!
-        --     -- local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
-        --     -- client.server_capabilities.completionProvider.triggerCharacters = chars
-        --     vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-        -- end
         -- Auto-format ("lint") on save.
         -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
         if not client:supports_method 'textDocument/willSaveWaitUntil' and client:supports_method 'textDocument/formatting' then
