@@ -47,5 +47,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
                 end,
             })
         end
+        if client.server_capabilities.documentFormattingProvider then
+            -- Normal mode: format whole buffer
+            bind('<leader>bf', function()
+                vim.lsp.buf.format { bufnr = args.buf }
+            end, { buffer = args.buf, desc = 'Format buffer' })
+        end
     end,
 })

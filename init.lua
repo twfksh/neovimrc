@@ -1,7 +1,7 @@
 if vim.loader then
     vim.loader.enable()
 end
-require('vim._core.ui2').enable({})
+require('vim._core.ui2').enable {}
 
 vim.api.nvim_set_hl(0, '@lsp.type.number', { italic = true })
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
@@ -40,25 +40,29 @@ bind('-', ':Ex<cr>', {})
 bind('jk', '<Esc>', {}, 'i')
 bind('<Esc>', '<cmd>nohlsearch<cr>', {})
 
-local gh = function(x) return 'https://github.com/' .. x end
-local cb = function(x) return 'https://codeberg.org/' .. x end
+local gh = function(x)
+    return 'https://github.com/' .. x
+end
+local cb = function(x)
+    return 'https://codeberg.org/' .. x
+end
 
 vim.pack.add({
-    gh('vague2k/vague.nvim'),
-    gh('itchyny/lightline.vim'),
-    gh('chentoast/marks.nvim'),
-    gh('nvim-mini/mini.pairs'),
-    gh('lewis6991/gitsigns.nvim'),
+    gh 'vague2k/vague.nvim',
+    gh 'itchyny/lightline.vim',
+    gh 'chentoast/marks.nvim',
+    gh 'nvim-mini/mini.pairs',
+    gh 'lewis6991/gitsigns.nvim',
     -- gh('arborist-ts/arborist.nvim'),
-    gh('neovim/nvim-lspconfig'),
-    gh('mason-org/mason.nvim'),
-    gh('mason-org/mason-lspconfig.nvim'),
-    gh('WhoIsSethDaniel/mason-tool-installer.nvim'),
-    { src = gh('saghen/blink.cmp'), version = vim.version.range '^v1.*' },
-    gh('ibhagwan/fzf-lua'),
-    gh('folke/flash.nvim'),
-    gh('chomosuke/typst-preview.nvim'),
-    cb('mfussenegger/nvim-dap'),
+    gh 'neovim/nvim-lspconfig',
+    gh 'mason-org/mason.nvim',
+    gh 'mason-org/mason-lspconfig.nvim',
+    gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
+    { src = gh 'saghen/blink.cmp', version = vim.version.range '^v1.*' },
+    gh 'ibhagwan/fzf-lua',
+    gh 'folke/flash.nvim',
+    gh 'chomosuke/typst-preview.nvim',
+    cb 'mfussenegger/nvim-dap',
 }, { confirm = false })
 
 vim.cmd [[colorscheme vague]]
@@ -89,18 +93,18 @@ require('mason-lspconfig').setup()
 require('mason-tool-installer').setup {
     ensure_installed = vim.tbl_keys(lsp_servers),
 }
-require('blink.cmp').setup({
+require('blink.cmp').setup {
     keymap = { preset = 'super-tab' },
     appearance = {
-        nerd_font_variant = 'mono'
+        nerd_font_variant = 'mono',
     },
     completion = {
-        documentation = { auto_show = false }
+        documentation = { auto_show = false },
     },
     sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
-})
+}
 
 require('fzf-lua').setup {
     winopts = {
@@ -121,8 +125,10 @@ bind('<leader>fdd', ':FzfLua diagnostics_document<cr>', {})
 bind('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', {})
 
 vim.diagnostic.config { virtual_text = false }
-bind('<leader>e', function() vim.diagnostic.open_float(nil, { focus = false }) end, {})
+bind('<leader>e', function()
+    vim.diagnostic.open_float(nil, { focus = false })
+end, {})
 
 require('flash').setup {}
-bind('s', function() require('flash').jump() end, { desc = 'flash' }, { 'n', 'x', 'o' })
-bind('<c-s>', function() require('flash').toggle() end, { desc = 'toggle flash' }, 'c')
+bind('s', require('flash').jump, { desc = 'flash' }, { 'n', 'x', 'o' })
+bind('<c-s>', require('flash').toggle, { desc = 'toggle flash' }, 'c')
