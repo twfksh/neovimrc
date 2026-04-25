@@ -1,3 +1,5 @@
+vim.pack.add { 'https://github.com/itchyny/lightline.vim' }
+
 function _G.lightline_filename_with_lsp()
     local ft = vim.bo.filetype
     if ft == '' then
@@ -22,7 +24,7 @@ vim.g.lightline = {
     colorscheme = 'wombat',
     active = {
         left = {
-            { 'mode', 'paste' },
+            { 'mode',     'paste' },
             { 'readonly', 'filename', 'modified' },
         },
         right = {

@@ -1,4 +1,4 @@
-local bind = require('utils').bind
+local bind = require('helpers').bind
 
 vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (copying) text',

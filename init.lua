@@ -33,7 +33,7 @@ vim.opt.splitbelow = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
-local bind = require('utils').bind
+local bind = require('helpers').bind
 
 bind(';', ':', {})
 bind('-', ':Ex<cr>', {})

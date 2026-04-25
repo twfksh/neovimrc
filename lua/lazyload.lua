@@ -17,19 +17,21 @@ local function drain(queue)
 end
 
 local function drain_override()
-    if not override_queue then return end
+    if not override_queue then
+        return
+    end
     for _, entry in ipairs(override_queue) do
         vim.schedule(function()
             local ok, err = pcall(entry.fn)
             if not ok then
-                vim.notify((".nvim.lua override error:\n%s"):format(err), vim.log.levels.ERROR)
+                vim.notify(('.nvim.lua override error:\n%s'):format(err), vim.log.levels.ERROR)
             end
         end)
     end
     override_queue = nil
 end
 
-vim.api.nvim_create_autocmd("VimEnter", {
+vim.api.nvim_create_autocmd('VimEnter', {
     once = true,
     callback = function()
         drain(vim_enter_queue)
