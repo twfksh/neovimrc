@@ -1,7 +1,11 @@
 if vim.loader then
     vim.loader.enable()
 end
+
 require('vim._core.ui2').enable {}
+
+local bind = require('helpers').bind
+local lazyload = require 'lazyload'
 
 vim.api.nvim_set_hl(0, '@lsp.type.number', { italic = true })
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
@@ -33,40 +37,30 @@ vim.opt.splitbelow = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
-local bind = require('helpers').bind
-
 bind(';', ':', {})
 bind('-', ':Ex<cr>', {})
 bind('jk', '<Esc>', {}, 'i')
 bind('<Esc>', '<cmd>nohlsearch<cr>', {})
 
-local gh = function(x)
-    return 'https://github.com/' .. x
-end
-local cb = function(x)
-    return 'https://codeberg.org/' .. x
-end
+vim.diagnostic.config { virtual_text = false }
+bind('<leader>e', function()
+    vim.diagnostic.open_float(nil, { focus = false })
+end, {})
 
 vim.pack.add({
-    gh 'vague2k/vague.nvim',
-    gh 'itchyny/lightline.vim',
-    gh 'chentoast/marks.nvim',
-    gh 'nvim-mini/mini.pairs',
-    gh 'lewis6991/gitsigns.nvim',
-    -- gh('arborist-ts/arborist.nvim'),
-    gh 'neovim/nvim-lspconfig',
-    gh 'mason-org/mason.nvim',
-    gh 'mason-org/mason-lspconfig.nvim',
-    gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
-    { src = gh 'saghen/blink.cmp', version = vim.version.range '^v1.*' },
-    gh 'ibhagwan/fzf-lua',
-    gh 'folke/flash.nvim',
-    gh 'chomosuke/typst-preview.nvim',
-    cb 'mfussenegger/nvim-dap',
+    'https://github.com/vague2k/vague.nvim',
+    'https://github.com/itchyny/lightline.vim',
+    'https://github.com/chentoast/marks.nvim',
+    'https://github.com/nvim-mini/mini.pairs',
+    'https://github.com/lewis6991/gitsigns.nvim',
+    -- 'https://github.com/arborist-ts/arborist.nvim',
+    'https://github.com/folke/flash.nvim',
+    'https://github.com/chomosuke/typst-preview.nvim',
+    'https://codeberg.org/mfussenegger/nvim-dap',
 }, { confirm = false })
 
+-- require('vague').setup { transparent = true }
 vim.cmd [[colorscheme vague]]
-vim.g.lightline = { colorscheme = 'wombat' }
 
 require('marks').setup {}
 require('mini.pairs').setup {}
@@ -85,49 +79,62 @@ require('gitsigns').setup {
     },
 }
 
-local lsp_servers = {
-    lua_ls = { Lua = { workspace = { library = vim.api.nvim_get_runtime_file('lua', true) } } },
-}
-require('mason').setup()
-require('mason-lspconfig').setup()
-require('mason-tool-installer').setup {
-    ensure_installed = vim.tbl_keys(lsp_servers),
-}
-require('blink.cmp').setup {
-    keymap = { preset = 'super-tab' },
-    appearance = {
-        nerd_font_variant = 'mono',
-    },
-    completion = {
-        documentation = { auto_show = false },
-    },
-    sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
-    },
-}
+lazyload.on_event({ 'BufReadPre', 'BufNewFile' }, function()
+    vim.pack.add {
+        { src = 'https://github.com/neovim/nvim-lspconfig' },
+        { src = 'https://github.com/mason-org/mason.nvim' },
+        { src = 'https://github.com/mason-org/mason-lspconfig.nvim' },
+        { src = 'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim' },
+    }
 
-require('fzf-lua').setup {
-    winopts = {
-        border = 'single',
-        preview = {
-            border = 'single',
+    local lsp_servers = {
+        lua_ls = { Lua = { workspace = { library = vim.api.nvim_get_runtime_file('lua', true) } } },
+    }
+    require('mason').setup()
+    require('mason-lspconfig').setup()
+    require('mason-tool-installer').setup {
+        ensure_installed = vim.tbl_keys(lsp_servers),
+    }
+end)
+
+lazyload.on_event('InsertEnter', function()
+    vim.pack.add { { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '^v1.*' } }
+    require('blink.cmp').setup {
+        keymap = { preset = 'super-tab' },
+        appearance = {
+            nerd_font_variant = 'mono',
         },
-    },
-}
-require('fzf-lua').register_ui_select {}
+        completion = {
+            documentation = { auto_show = false },
+        },
+        sources = {
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
+        },
+    }
+end)
 
-bind('<leader>ff', ':FzfLua files<cr>', {})
-bind('<leader>f.', ':FzfLua buffers<cr>', {})
-bind('<leader>frg', ':FzfLua grep_curbuf<cr>', {})
-bind('<leader>fg', ':FzfLua lgrep_curbuf<cr>', {})
-bind('<leader>fm', ':FzfLua marks<cr>', {})
-bind('<leader>fdd', ':FzfLua diagnostics_document<cr>', {})
-bind('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', {})
+lazyload.on_vim_enter(function()
+    vim.pack.add { 'https://github.com/ibhagwan/fzf-lua' }
+    require('fzf-lua').setup {
+        winopts = {
+            border = 'single',
+            preview = {
+                border = 'single',
+            },
+        },
+    }
+    require('fzf-lua').register_ui_select {}
 
-vim.diagnostic.config { virtual_text = false }
-bind('<leader>e', function()
-    vim.diagnostic.open_float(nil, { focus = false })
-end, {})
+    bind('<leader>ff', ':FzfLua files<cr>', { desc = 'Find files' })
+    bind('<leader>f.', ':FzfLua buffers<cr>', { desc = 'Find buffers' })
+    bind('<leader>lg', ':FzfLua lgrep_curbuf<cr>', { desc = 'Live Grep current buffer' })
+    bind('<leader>gp', ':FzfLua grep_project<cr>', { desc = 'Grep project' })
+    bind('<leader>fh', ':FzfLua helptags<cr>', { desc = 'Find helptags' })
+    bind('<leader>fk', ':FzfLua keymaps<cr>', { desc = 'Find keymaps' })
+    bind('<leader>fm', ':FzfLua marks<cr>', { desc = 'Find marks' })
+    bind('<leader>fdd', ':FzfLua diagnostics_document<cr>', { desc = 'Find document diagnostics' })
+    bind('<leader>fdw', ':FzfLua diagnostics_workspace<cr>', { desc = 'Find workspace diagnostics' })
+end)
 
 require('flash').setup {}
 bind('s', require('flash').jump, { desc = 'flash' }, { 'n', 'x', 'o' })

@@ -56,7 +56,7 @@ function M.merge(base, override)
                     end
                 end
             else
-                merge(bv, v)
+                M.merge(bv, v)
             end
         else
             base[k] = v

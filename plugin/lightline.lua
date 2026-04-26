@@ -24,7 +24,7 @@ vim.g.lightline = {
     colorscheme = 'wombat',
     active = {
         left = {
-            { 'mode',     'paste' },
+            { 'mode', 'paste' },
             { 'readonly', 'filename', 'modified' },
         },
         right = {

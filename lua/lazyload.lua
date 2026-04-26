@@ -59,4 +59,42 @@ function M.on_override(fn)
     end
 end
 
+function M.on_event(event, fn, opts)
+    vim.api.nvim_create_autocmd(event, {
+        once = true,
+        callback = function()
+            if opts and opts.sync then
+                fn()
+            else
+                vim.schedule(fn)
+            end
+        end,
+    })
+end
+
+function M.on_cmd(cmd, fn)
+    vim.api.nvim_create_user_command(cmd, function(args)
+        fn()
+        vim.cmd(cmd .. ' ' .. (args.args or ''))
+    end, { nargs = '*' })
+end
+
+function M.on_keys(lhs, fn, mode)
+    mode = mode or 'n'
+    vim.keymap.set(mode, lhs, function()
+        fn()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(lhs, true, false, true), mode, false)
+    end, { silent = true })
+end
+
+function M.on_ft(ft, fn)
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = ft,
+        once = true,
+        callback = function()
+            vim.schedule(fn)
+        end,
+    })
+end
+
 return M
