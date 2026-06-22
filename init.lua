@@ -2,7 +2,7 @@ if vim.loader then
     vim.loader.enable()
 end
 
-require('vim._core.ui2').enable {}
+-- require('vim._core.ui2').enable {}
 
 --[General Options] - nvim settings and behavior
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
@@ -52,25 +52,37 @@ vim.keymap.set('n', ']d', function()
     vim.diagnostic.jump { count = 1 }
 end, { desc = 'Next diagnostic' })
 
+
+-- required by fff.nvim
+vim.api.nvim_create_autocmd('PackChanged', {
+    callback = function(ev)
+        local name, kind = ev.data.spec.name, ev.data.kind
+        if name == 'fff.nvim' and (kind == 'install' or kind == 'update') then
+            if not ev.data.active then
+                vim.cmd.packadd 'fff.nvim'
+            end
+            require('fff.download').download_or_build_binary()
+        end
+    end,
+})
 --[Plugin Declarations] - all plugin sources
 vim.pack.add({
     'https://github.com/vague2k/vague.nvim',
-    'https://github.com/sainnhe/gruvbox-material',
     'https://github.com/itchyny/lightline.vim',
     'https://github.com/chentoast/marks.nvim',
-    'https://github.com/nvim-mini/mini.pairs',
+    'https://github.com/windwp/nvim-autopairs',
     'https://github.com/nvim-mini/mini.indentscope',
     'https://github.com/lewis6991/gitsigns.nvim',
     'https://github.com/folke/flash.nvim',
     'https://github.com/chomosuke/typst-preview.nvim',
     'https://codeberg.org/mfussenegger/nvim-dap',
-    { src = 'https://github.com/neovim/nvim-lspconfig' },
-    { src = 'https://github.com/mason-org/mason.nvim' },
-    { src = 'https://github.com/mason-org/mason-lspconfig.nvim' },
+    'https://github.com/neovim/nvim-lspconfig',
+    'https://github.com/mason-org/mason.nvim',
+    'https://github.com/mason-org/mason-lspconfig.nvim',
     { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '^v1.*' },
     'https://github.com/ibhagwan/fzf-lua',
     'https://github.com/dmtrKovalenko/fff.nvim',
-    { src = 'https://github.com/stevearc/conform.nvim' },
+    'https://github.com/stevearc/conform.nvim',
 }, { confirm = false })
 
 --[Theme] - colorscheme and highlight overrides
@@ -82,11 +94,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 
 vim.cmd [[colorscheme vague]]
 
---[Editor] - lightweight plugin setups
-require('marks').setup {}
-require('mini.pairs').setup {}
-require('mini.indentscope').setup {}
-
+--[Editor] - plugin setups
 require('flash').setup {}
 vim.keymap.set({ 'n', 'x', 'o' }, 's', require('flash').jump, { desc = 'flash' })
 vim.keymap.set('c', '<c-s>', require('flash').toggle, { desc = 'toggle flash' })
@@ -113,7 +121,7 @@ vim.g.lightline = {
     colorscheme = 'wombat',
     active = {
         left = {
-            { 'mode', 'paste' },
+            { 'mode',     'paste' },
             { 'readonly', 'filename', 'modified' },
         },
         right = {
@@ -142,6 +150,31 @@ vim.api.nvim_create_autocmd('BufReadPre', {
             current_line_blame = true,
             current_line_blame_opts = {
                 delay = 250,
+            },
+        }
+    end,
+})
+
+--[Editor Setup] - marks, indentscope, conform (deferred)
+vim.api.nvim_create_autocmd('BufReadPre', {
+    once = true,
+    callback = function()
+        require('marks').setup {}
+        require('mini.indentscope').setup {}
+        require('conform').setup {
+            format_on_save = {
+                timeout_ms = 500,
+                lsp_format = 'fallback',
+            },
+            formatters_by_ft = {
+                lua = { 'stylua' },
+                zig = { 'zigfmt' },
+                typescript = { 'prettierd', 'prettier' },
+                typescriptreact = { 'prettierd', 'prettier' },
+                javascript = { 'prettierd', 'prettier' },
+                javascriptreact = { 'prettierd', 'prettier' },
+                json = { 'prettierd', 'prettier' },
+                yaml = { 'prettierd', 'prettier' },
             },
         }
     end,
@@ -220,6 +253,7 @@ vim.api.nvim_create_autocmd('BufReadPre', {
 vim.api.nvim_create_autocmd('InsertEnter', {
     once = true,
     callback = function()
+        require('nvim-autopairs').setup {}
         require('blink.cmp').setup {
             keymap = { preset = 'super-tab' },
             appearance = {
@@ -235,53 +269,24 @@ vim.api.nvim_create_autocmd('InsertEnter', {
     end,
 })
 
---[Formatting] - conform.nvim for async safe formatting
-require('conform').setup {
-    format_on_save = {
-        timeout_ms = 500,
-        lsp_format = 'fallback',
-    },
-    formatters_by_ft = {
-        lua = { 'stylua' },
-        zig = { 'zigfmt' },
-        typescript = { 'prettierd', 'prettier' },
-        typescriptreact = { 'prettierd', 'prettier' },
-        javascript = { 'prettierd', 'prettier' },
-        javascriptreact = { 'prettierd', 'prettier' },
-        json = { 'prettierd', 'prettier' },
-        yaml = { 'prettierd', 'prettier' },
+--[Fuzzy Finder] - fzf-lua
+require('fzf-lua').setup {
+    winopts = {
+        border = 'single',
+        preview = {
+            border = 'single',
+        },
     },
 }
+require('fzf-lua').register_ui_select {}
 
---[Fuzzy Finder] - fzf-lua and fff.nvim
--- fzf-lua: loaded lazily on first keymap use
-local fzf_loaded = false
-local function fzf_lazy(command)
-    return function()
-        if not fzf_loaded then
-            fzf_loaded = true
-            vim.cmd.packadd 'fzf-lua'
-            require('fzf-lua').setup {
-                winopts = {
-                    border = 'single',
-                    preview = {
-                        border = 'single',
-                    },
-                },
-            }
-            require('fzf-lua').register_ui_select {}
-        end
-        vim.cmd('FzfLua ' .. command)
-    end
-end
-
-vim.keymap.set('n', '<leader>f.', fzf_lazy 'buffers', { desc = 'Find buffers' })
-vim.keymap.set('n', '<leader>lg', fzf_lazy 'lgrep_curbuf', { desc = 'Live Grep current buffer' })
-vim.keymap.set('n', '<leader>fh', fzf_lazy 'helptags', { desc = 'Find helptags' })
-vim.keymap.set('n', '<leader>fk', fzf_lazy 'keymaps', { desc = 'Find keymaps' })
-vim.keymap.set('n', '<leader>fm', fzf_lazy 'marks', { desc = 'Find marks' })
-vim.keymap.set('n', '<leader>fdd', fzf_lazy 'diagnostics_document', { desc = 'Find document diagnostics' })
-vim.keymap.set('n', '<leader>fdw', fzf_lazy 'diagnostics_workspace', { desc = 'Find workspace diagnostics' })
+vim.keymap.set('n', '<leader>f.', '<cmd>FzfLua buffers<cr>', { desc = 'Find buffers' })
+vim.keymap.set('n', '<leader>lg', '<cmd>FzfLua lgrep_curbuf<cr>', { desc = 'Live Grep current buffer' })
+vim.keymap.set('n', '<leader>fh', '<cmd>FzfLua helptags<cr>', { desc = 'Find helptags' })
+vim.keymap.set('n', '<leader>fk', '<cmd>FzfLua keymaps<cr>', { desc = 'Find keymaps' })
+vim.keymap.set('n', '<leader>fm', '<cmd>FzfLua marks<cr>', { desc = 'Find marks' })
+vim.keymap.set('n', '<leader>fdd', '<cmd>FzfLua diagnostics_document<cr>', { desc = 'Find document diagnostics' })
+vim.keymap.set('n', '<leader>fdw', '<cmd>FzfLua diagnostics_workspace<cr>', { desc = 'Find workspace diagnostics' })
 
 -- fff.nvim
 require('fff').setup {
@@ -307,18 +312,6 @@ require('fff').setup {
 }
 vim.keymap.set('n', 'ff', require('fff').find_files, { desc = 'FFF: find files' })
 vim.keymap.set('n', 'fg', require('fff').live_grep, { desc = 'FFF: live grep' })
-
-vim.api.nvim_create_autocmd('PackChanged', {
-    callback = function(ev)
-        local name, kind = ev.data.spec.name, ev.data.kind
-        if name == 'fff.nvim' and (kind == 'install' or kind == 'update') then
-            if not ev.data.active then
-                vim.cmd.packadd 'fff.nvim'
-            end
-            require('fff.download').download_or_build_binary()
-        end
-    end,
-})
 
 --[Built-in / Misc] - netrw, undotree, user commands
 vim.g.netrw_banner = 0
