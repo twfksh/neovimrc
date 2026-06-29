@@ -121,7 +121,7 @@ vim.g.lightline = {
     colorscheme = 'wombat',
     active = {
         left = {
-            { 'mode',     'paste' },
+            { 'mode', 'paste' },
             { 'readonly', 'filename', 'modified' },
         },
         right = {
@@ -161,16 +161,16 @@ vim.api.nvim_create_autocmd('BufReadPre', {
     callback = function()
         require('marks').setup {}
         require('mini.indentscope').setup {}
-        local hipatterns = require('mini.hipatterns')
-        hipatterns.setup({
+        local hipatterns = require 'mini.hipatterns'
+        hipatterns.setup {
             highlighters = {
-                fixme     = { pattern = 'FIXME', group = 'MiniHipatternsFixme' },
-                hack      = { pattern = 'HACK', group = 'MiniHipatternsHack' },
-                todo      = { pattern = 'TODO', group = 'MiniHipatternsTodo' },
-                note      = { pattern = 'NOTE', group = 'MiniHipatternsNote' },
-                hex_color = hipatterns.gen_highlighter.hex_color({ priority = 2000 }),
-            }
-        })
+                fixme = { pattern = 'FIXME', group = 'MiniHipatternsFixme' },
+                hack = { pattern = 'HACK', group = 'MiniHipatternsHack' },
+                todo = { pattern = 'TODO', group = 'MiniHipatternsTodo' },
+                note = { pattern = 'NOTE', group = 'MiniHipatternsNote' },
+                hex_color = hipatterns.gen_highlighter.hex_color { priority = 2000 },
+            },
+        }
         require('conform').setup {
             format_on_save = {
                 timeout_ms = 500,
@@ -186,6 +186,14 @@ vim.api.nvim_create_autocmd('BufReadPre', {
                 json = { 'prettierd', 'prettier' },
                 yaml = { 'prettierd', 'prettier' },
             },
+            formatters = {
+                zigfmt = {
+                    command = 'zig',
+                    args = { 'fmt', '--stdin' },
+                    stdin = true,
+                },
+            },
+            notify_on_error = false,
         }
     end,
 })
@@ -246,13 +254,7 @@ vim.api.nvim_create_autocmd('BufReadPre', {
             pyrefly = {},
             rust_analyzer = {},
             gopls = {},
-            zls = {
-                on_attach = function(client)
-                    client.server_capabilities.documentFormattingProvider = false
-                    client.server_capabilities.documentRangeFormattingProvider = false
-                    client.server_capabilities.willSaveWaitUntil = false
-                end,
-            },
+            zls = {},
         }
         require('mason').setup()
         require('mason-lspconfig').setup {
