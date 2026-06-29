@@ -35,6 +35,21 @@ vim.opt.splitbelow = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
+--[Built-in / Misc] - netrw, undotree, user commands
+vim.g.netrw_banner = 0
+
+vim.g.loaded_2html_plugin = 1
+vim.g.loaded_getscript = 1
+vim.g.loaded_getscriptPlugin = 1
+vim.g.loaded_vimballPlugin = 1
+vim.g.loaded_tarPlugin = 1
+vim.g.loaded_zipPlugin = 1
+vim.g.loaded_gzip = 1
+vim.g.loaded_vimball = 1
+
+vim.cmd [[packadd nvim.undotree]]
+vim.keymap.set('n', '<leader>u', ':Undotree<cr>', {})
+
 vim.keymap.set('n', ';', ':', {})
 vim.keymap.set('n', '-', ':Ex<cr>', {})
 vim.keymap.set('i', 'jk', '<Esc>', {})
@@ -317,21 +332,6 @@ require('fff').setup {
 }
 vim.keymap.set('n', 'ff', require('fff').find_files, { desc = 'FFF: find files' })
 vim.keymap.set('n', 'fg', require('fff').live_grep, { desc = 'FFF: live grep' })
-
---[Built-in / Misc] - netrw, undotree, user commands
-vim.g.netrw_banner = 0
-
-vim.g.loaded_2html_plugin = 1
-vim.g.loaded_getscript = 1
-vim.g.loaded_getscriptPlugin = 1
-vim.g.loaded_vimballPlugin = 1
-vim.g.loaded_tarPlugin = 1
-vim.g.loaded_zipPlugin = 1
-vim.g.loaded_gzip = 1
-vim.g.loaded_vimball = 1
-
-vim.cmd [[packadd nvim.undotree]]
-vim.keymap.set('n', '<leader>u', ':Undotree<cr>', {})
 
 vim.api.nvim_create_user_command('PackClean', function()
     local unused = {}
