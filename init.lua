@@ -2,7 +2,7 @@ if vim.loader then
     vim.loader.enable()
 end
 
-require('vim._core.ui2').enable {}
+-- require('vim._core.ui2').enable {}
 
 --[General Options] - nvim settings and behavior
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
@@ -94,7 +94,8 @@ vim.pack.add({
     'https://github.com/neovim/nvim-lspconfig',
     'https://github.com/mason-org/mason.nvim',
     'https://github.com/mason-org/mason-lspconfig.nvim',
-    { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '^v1.*' },
+    'https://github.com/saghen/blink.lib',
+    'https://github.com/saghen/blink.cmp',
     'https://github.com/ibhagwan/fzf-lua',
     'https://github.com/dmtrKovalenko/fff.nvim',
     'https://github.com/stevearc/conform.nvim',
@@ -179,6 +180,7 @@ vim.api.nvim_create_autocmd('BufReadPre', {
                 hex_color = hipatterns.gen_highlighter.hex_color { priority = 2000 },
             },
         }
+        --[LSP] - mason, lspconfig
         local servers = {
             lua_ls = require 'lsp.lua_ls',
             tinymist = require 'lsp.tinymist',
@@ -225,6 +227,15 @@ vim.api.nvim_create_autocmd('BufReadPre', {
     end,
 })
 
+-- [Misc & Completion] - autopairs, blink.cmp
+vim.api.nvim_create_autocmd('InsertEnter', {
+    once = true,
+    callback = function()
+        require('nvim-autopairs').setup {}
+        require('blink.cmp').setup {}
+    end,
+})
+
 --[DAP] - debugging keymaps
 local dap = require 'dap'
 vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = 'Toggle breakpoint' })
@@ -236,59 +247,6 @@ vim.keymap.set('n', '<leader>do', dap.step_over, { desc = 'Step over' })
 vim.keymap.set('n', '<leader>di', dap.step_into, { desc = 'Step into' })
 vim.keymap.set('n', '<leader>dO', dap.step_out, { desc = 'Step out' })
 vim.keymap.set('n', '<leader>dr', dap.repl.open, { desc = 'Open REPL' })
-
---[LSP / Completion] - mason, lspconfig, blink.cmp
-vim.api.nvim_create_autocmd('LspAttach', {
-    group = vim.api.nvim_create_augroup('my.lsp', {}),
-    callback = function(args)
-        local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-        if client:supports_method 'textDocument/definition' then
-            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/declaration' then
-            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/implementation' then
-            vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/hover' then
-            vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/references' then
-            vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/rename' then
-            vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { buffer = args.buf })
-        end
-        if client:supports_method 'textDocument/codeAction' then
-            vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { buffer = args.buf })
-        end
-        if client.server_capabilities.documentFormattingProvider then
-            vim.keymap.set('n', '<leader>bf', function()
-                require('conform').format { lsp = 'fallback' }
-            end, { buffer = args.buf, desc = 'Format buffer' })
-        end
-    end,
-})
-
-vim.api.nvim_create_autocmd('InsertEnter', {
-    once = true,
-    callback = function()
-        require('nvim-autopairs').setup {}
-        require('blink.cmp').setup {
-            keymap = { preset = 'super-tab' },
-            appearance = {
-                nerd_font_variant = 'mono',
-            },
-            completion = {
-                documentation = { auto_show = false },
-            },
-            sources = {
-                default = { 'lsp', 'path', 'snippets', 'buffer' },
-            },
-        }
-    end,
-})
 
 --[Fuzzy Finder] - fzf-lua & fff
 require('fzf-lua').setup {
@@ -362,5 +320,38 @@ vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'superhtml' },
     callback = function()
         vim.treesitter.start()
+    end,
+})
+
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('my.lsp', {}),
+    callback = function(args)
+        local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+        if client:supports_method 'textDocument/definition' then
+            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/declaration' then
+            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/implementation' then
+            vim.keymap.set('n', 'gI', vim.lsp.buf.implementation, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/hover' then
+            vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/references' then
+            vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/rename' then
+            vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { buffer = args.buf })
+        end
+        if client:supports_method 'textDocument/codeAction' then
+            vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { buffer = args.buf })
+        end
+        if client.server_capabilities.documentFormattingProvider then
+            vim.keymap.set('n', '<leader>bf', function()
+                require('conform').format { lsp = 'fallback' }
+            end, { buffer = args.buf, desc = 'Format buffer' })
+        end
     end,
 })
