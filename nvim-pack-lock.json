@@ -49,10 +49,6 @@
       "rev": "942bc13ccc624c825b086373b8bd6787b98245c8",
       "src": "https://github.com/nvim-mini/mini.indentscope"
     },
-    "mini.surround": {
-      "rev": "a2f644f3759edd3d3f8b6a6d55378408bfe6d290",
-      "src": "https://github.com/nvim-mini/mini.surround"
-    },
     "nvim-autopairs": {
       "rev": "7b9923abad60b903ece7c52940e1321d39eccc79",
       "src": "https://github.com/windwp/nvim-autopairs"
@@ -64,10 +60,6 @@
     "nvim-lspconfig": {
       "rev": "3371bf298c1f56efc26771ee961f461176958fb5",
       "src": "https://github.com/neovim/nvim-lspconfig"
-    },
-    "opencode.nvim": {
-      "rev": "2d05f88d72a239e0f9f186cb2201ca9021a354e3",
-      "src": "https://github.com/dmtrKovalenko/opencode.nvim"
     },
     "typst-preview.nvim": {
       "rev": "87db18b8d19c8b0eed399f52e4c527ce5afe4817",

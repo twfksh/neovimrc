@@ -2,7 +2,7 @@ if vim.loader then
     vim.loader.enable()
 end
 
--- require('vim._core.ui2').enable {}
+require('vim._core.ui2').enable {}
 
 --[General Options] - nvim settings and behavior
 vim.cmd [[set completeopt+=menuone,noselect,popup]]
@@ -135,7 +135,7 @@ vim.g.lightline = {
     },
 }
 
---[Git] - gitsigns with deferred loading
+--[Editor Setup] - gitsigns, marks, indentscope, lsp-config, conform (deferred)
 vim.api.nvim_create_autocmd('BufReadPre', {
     once = true,
     callback = function()
@@ -152,13 +152,6 @@ vim.api.nvim_create_autocmd('BufReadPre', {
                 delay = 250,
             },
         }
-    end,
-})
-
---[Editor Setup] - marks, indentscope, conform (deferred)
-vim.api.nvim_create_autocmd('BufReadPre', {
-    once = true,
-    callback = function()
         require('marks').setup {}
         require('mini.indentscope').setup {}
         local hipatterns = require 'mini.hipatterns'
@@ -169,6 +162,25 @@ vim.api.nvim_create_autocmd('BufReadPre', {
                 todo = { pattern = 'TODO', group = 'MiniHipatternsTodo' },
                 note = { pattern = 'NOTE', group = 'MiniHipatternsNote' },
                 hex_color = hipatterns.gen_highlighter.hex_color { priority = 2000 },
+            },
+        }
+        local servers = {
+            lua_ls = require 'lsp.lua_ls',
+            tinymist = require 'lsp.tinymist',
+            ts_ls = {},
+            pyrefly = {},
+            rust_analyzer = {},
+            gopls = {},
+            zls = {},
+        }
+        require('mason').setup()
+        require('mason-lspconfig').setup {
+            ensure_installed = vim.tbl_keys(servers),
+            handlers = {
+                function(server_name)
+                    local config = servers[server_name] or {}
+                    require('lspconfig')[server_name].setup(config)
+                end,
             },
         }
         require('conform').setup {
@@ -244,31 +256,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
-vim.api.nvim_create_autocmd('BufReadPre', {
-    once = true,
-    callback = function()
-        local servers = {
-            lua_ls = require 'lsp.lua_ls',
-            tinymist = require 'lsp.tinymist',
-            ts_ls = {},
-            pyrefly = {},
-            rust_analyzer = {},
-            gopls = {},
-            zls = {},
-        }
-        require('mason').setup()
-        require('mason-lspconfig').setup {
-            ensure_installed = vim.tbl_keys(servers),
-            handlers = {
-                function(server_name)
-                    local config = servers[server_name] or {}
-                    require('lspconfig')[server_name].setup(config)
-                end,
-            },
-        }
-    end,
-})
-
 vim.api.nvim_create_autocmd('InsertEnter', {
     once = true,
     callback = function()
@@ -288,7 +275,7 @@ vim.api.nvim_create_autocmd('InsertEnter', {
     end,
 })
 
---[Fuzzy Finder] - fzf-lua
+--[Fuzzy Finder] - fzf-lua & fff
 require('fzf-lua').setup {
     winopts = {
         border = 'single',
@@ -307,7 +294,6 @@ vim.keymap.set('n', '<leader>fm', '<cmd>FzfLua marks<cr>', { desc = 'Find marks'
 vim.keymap.set('n', '<leader>fdd', '<cmd>FzfLua diagnostics_document<cr>', { desc = 'Find document diagnostics' })
 vim.keymap.set('n', '<leader>fdw', '<cmd>FzfLua diagnostics_workspace<cr>', { desc = 'Find workspace diagnostics' })
 
--- fff.nvim
 require('fff').setup {
     lazy_sync = true,
     layout = {
@@ -369,14 +355,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
     callback = function()
         vim.hl.on_yank()
-    end,
-})
-
-vim.api.nvim_create_autocmd('BufWinEnter', {
-    pattern = '*.jsx,*.tsx',
-    group = vim.api.nvim_create_augroup('TS', { clear = true }),
-    callback = function()
-        vim.cmd [[set filetype=typescriptreact]]
     end,
 })
 
