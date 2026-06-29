@@ -232,7 +232,9 @@ vim.api.nvim_create_autocmd('InsertEnter', {
     once = true,
     callback = function()
         require('nvim-autopairs').setup {}
-        require('blink.cmp').setup {}
+        require('blink.cmp').setup {
+            keymap = { preset = 'super-tab' },
+        }
     end,
 })
 
