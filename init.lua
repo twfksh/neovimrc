@@ -52,7 +52,6 @@ vim.keymap.set('n', ']d', function()
     vim.diagnostic.jump { count = 1 }
 end, { desc = 'Next diagnostic' })
 
-
 -- required by fff.nvim
 vim.api.nvim_create_autocmd('PackChanged', {
     callback = function(ev)
@@ -71,6 +70,7 @@ vim.pack.add({
     'https://github.com/itchyny/lightline.vim',
     'https://github.com/chentoast/marks.nvim',
     'https://github.com/windwp/nvim-autopairs',
+    'https://github.com/nvim-mini/mini.hipatterns',
     'https://github.com/nvim-mini/mini.indentscope',
     'https://github.com/lewis6991/gitsigns.nvim',
     'https://github.com/folke/flash.nvim',
@@ -161,6 +161,16 @@ vim.api.nvim_create_autocmd('BufReadPre', {
     callback = function()
         require('marks').setup {}
         require('mini.indentscope').setup {}
+        local hipatterns = require('mini.hipatterns')
+        hipatterns.setup({
+            highlighters = {
+                fixme     = { pattern = 'FIXME', group = 'MiniHipatternsFixme' },
+                hack      = { pattern = 'HACK', group = 'MiniHipatternsHack' },
+                todo      = { pattern = 'TODO', group = 'MiniHipatternsTodo' },
+                note      = { pattern = 'NOTE', group = 'MiniHipatternsNote' },
+                hex_color = hipatterns.gen_highlighter.hex_color({ priority = 2000 }),
+            }
+        })
         require('conform').setup {
             format_on_save = {
                 timeout_ms = 500,
