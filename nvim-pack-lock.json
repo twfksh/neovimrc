@@ -52,6 +52,10 @@
       "rev": "942bc13ccc624c825b086373b8bd6787b98245c8",
       "src": "https://github.com/nvim-mini/mini.indentscope"
     },
+    "mini.nvim": {
+      "rev": "dc8a9918c3b1bc18a5fcd04d39b6d658074c0886",
+      "src": "https://github.com/nvim-mini/mini.nvim"
+    },
     "nvim-autopairs": {
       "rev": "7b9923abad60b903ece7c52940e1321d39eccc79",
       "src": "https://github.com/windwp/nvim-autopairs"
@@ -63,6 +67,14 @@
     "nvim-lspconfig": {
       "rev": "3371bf298c1f56efc26771ee961f461176958fb5",
       "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    },
+    "tree-sitter-manager.nvim": {
+      "rev": "966c28dbc68fc99c82c51a64b6ec37f420aab880",
+      "src": "https://github.com/romus204/tree-sitter-manager.nvim"
     },
     "typst-preview.nvim": {
       "rev": "87db18b8d19c8b0eed399f52e4c527ce5afe4817",
