@@ -34,7 +34,7 @@ vim.keymap.set('n', '-', ':Ex<cr>', {})
 vim.keymap.set('i', 'jk', '<Esc>', {})
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<cr>', {})
 
-vim.diagnostic.config { virtual_lines = { only_current_line = true } }
+vim.diagnostic.config { virtual_text = { only_current_line = true } }
 vim.keymap.set('n', '<leader>e', function()
     vim.diagnostic.open_float(nil, { focus = false })
 end, {})
@@ -60,6 +60,7 @@ vim.pack.add {
     'https://github.com/lewis6991/gitsigns.nvim',
     'https://github.com/chentoast/marks.nvim',
     'https://github.com/folke/flash.nvim',
+    'https://github.com/OXY2DEV/markview.nvim',
 }
 
 local hipatterns = require 'mini.hipatterns'
@@ -74,27 +75,13 @@ hipatterns.setup {
 }
 
 require('mini.indentscope').setup {}
+-- require('mini.files').setup {}
+-- vim.keymap.set('n', '-', '<cmd>lua MiniFiles.open()<cr>', { desc = 'Open file explorer' })
 
-local statusline = require 'mini.statusline'
-statusline.setup {}
----@diagnostic disable-next-line: duplicate-set-field
-statusline.section_location = function()
-    return '%2l:%-2v'
-end
----@diagnostic disable-next-line: duplicate-set-field
-statusline.section_fileinfo = function()
-    local ft = vim.bo.filetype ~= '' and vim.bo.filetype or 'unknown'
-    local clients = vim.lsp.get_clients { bufnr = 0 }
-    local lsp = ''
-    if #clients > 0 then
-        local names = {}
-        for _, client in ipairs(clients) do
-            table.insert(names, client.name)
-        end
-        lsp = ' [' .. table.concat(names, ', ') .. ']'
-    end
-    return ft .. lsp .. ' %{&fenc?&fenc:&enc} %{&ff}'
-end
+vim.pack.add { 'https://github.com/itchyny/lightline.vim' }
+vim.g.lightline = {
+    colorscheme = 'wombat',
+}
 
 require('gitsigns').setup {
     signs = {
@@ -140,6 +127,18 @@ require('mason-lspconfig').setup {
         end,
     },
 }
+
+vim.pack.add { 'https://github.com/nvim-treesitter/nvim-treesitter' }
+
+require('nvim-treesitter').install { 'all' }
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = { '<filetype>' },
+    callback = function()
+        vim.treesitter.start()
+    end,
+})
+vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
 vim.pack.add { 'https://github.com/stevearc/conform.nvim' }
 
@@ -227,6 +226,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('my.lsp', {}),
     callback = function(args)
+        local opts = { buffer = args.buf, silent = true }
+
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+
         local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
         if client.server_capabilities.documentFormattingProvider then
             vim.keymap.set('n', '<leader>bf', function()
