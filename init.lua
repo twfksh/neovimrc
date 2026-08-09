@@ -231,6 +231,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
 
         local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+        if client.server_capabilities.inlayHintProvider then
+            vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+        end
         if client.server_capabilities.documentFormattingProvider then
             vim.keymap.set('n', '<leader>bf', function()
                 require('conform').format {
