@@ -15,33 +15,17 @@ vim.opt.termguicolors = true
 vim.opt.undofile = true
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.cmd("filetype plugin indent on")
+
+vim.opt.statusline = " %{%v:lua.require('statusline').mode_name()%} %<%f %h%m%r%=%-14.(%l,%c%V%) %P "
+vim.opt.laststatus = 3
 
 vim.g.mapleader = " "
 
 local map = vim.keymap.set
 
-local function source_local_session()
-	if vim.g.local_session_loaded or vim.fn.argc() ~= 0 then
-		return
-	end
+require("session"):init()
 
-	local cwd = vim.uv.cwd()
-	if not cwd then
-		return
-	end
-
-	local session = vim.fs.joinpath(cwd, "Session.vim")
-	if vim.fn.filereadable(session) == 1 then
-		vim.g.local_session_loaded = true
-		vim.cmd.source(vim.fn.fnameescape(session))
-	end
-end
-
-vim.api.nvim_create_autocmd("VimEnter", {
-	group = vim.api.nvim_create_augroup("local_session_auto_source", { clear = true }),
-	once = true,
-	callback = source_local_session,
-})
 
 vim.pack.add({
 	{ src = "https://github.com/sainnhe/everforest" },
@@ -60,7 +44,21 @@ vim.pack.add({
 	{ src = "https://github.com/rcarriga/nvim-dap-ui" },
 	{ src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
 	{ src = "https://github.com/julianolf/nvim-dap-lldb" },
-	{ src = "https://github.com/nvim-neotest/nvim-nio" }
+	{ src = "https://github.com/nvim-neotest/nvim-nio" },
+	{ src = "https://github.com/saghen/blink.lib" },
+	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
+})
+
+require("blink.cmp").setup({
+	keymap = {
+		preset = "enter",
+		["<C-e>"] = false,
+	},
+	snippets = { preset = "luasnip" },
+	sources = {
+		default = { "lsp", "path", "snippets", "buffer" },
+	},
+	fuzzy = { implementation = "lua" },
 })
 
 
@@ -133,6 +131,7 @@ require "mason".setup()
 vim.lsp.config("lua_ls", require("lsp.lua_ls"))
 vim.lsp.config("tinymist", require("lsp.tinymist"))
 vim.lsp.config("ocamllsp", { cmd = { "opam", "exec", "--", "ocamllsp" } })
+vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
 local default_color = "everforest"
 
@@ -145,46 +144,6 @@ require("fzf-lua").setup {
 		},
 	},
 }
-
-
-
-
-vim.api.nvim_create_autocmd('LspAttach', {
-	group = vim.api.nvim_create_augroup('my.lsp', {}),
-	callback = function(args)
-		local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-		if client:supports_method('textDocument/completion') then
-			if client.name == "ols" then
-				local chars = client.server_capabilities.completionProvider.triggerCharacters or {}
-				local seen = {}
-
-				for _, char in ipairs(chars) do
-					seen[char] = true
-				end
-
-				for char in ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"):gmatch(".") do
-					if not seen[char] then
-						table.insert(chars, char)
-						seen[char] = true
-					end
-				end
-
-				client.server_capabilities.completionProvider.triggerCharacters = chars
-			end
-
-			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-		end
-	end,
-})
-
-vim.opt.autocomplete = true
-vim.opt.completeopt = { "menuone", "noselect", "popup" }
-map("i", "<C-Space>", function()
-	vim.lsp.completion.get()
-end, { desc = "Trigger LSP completion" })
-map("i", "<CR>", function()
-	return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
-end, { expr = true, desc = "Accept completion or insert newline" })
 
 vim.lsp.enable({
 	"lua_ls", "cssls", "svelte", "tinymist",
@@ -218,6 +177,14 @@ vim.g.everforest_transparent_background = 2
 vim.g.everforest_better_performance = 1
 vim.g.everforest_enable_italic = 1
 vim.cmd.colorscheme(default_color)
+for _, name in ipairs({ "NormalFloat", "FloatBorder", "Pmenu" }) do
+	local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
+	highlight.bg = nil
+	highlight.ctermbg = nil
+	highlight.blend = nil
+	vim.api.nvim_set_hl(0, name, highlight --[[@as vim.api.keyset.highlight]])
+end
+require("statusline").setup()
 require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })
 
@@ -332,6 +299,9 @@ map({ "v", "x", "n" }, "<C-y>", '"+y', { desc = "System clipboard yank." })
 
 map({ "n" }, "<leader>p", preview_current_file, { desc = "Preview current file" })
 
+map("n", "<leader>ss", function() require("session"):save() end, { desc = "Save session" })
+map("n", "<leader>sd", function() require("session"):delete() end, { desc = "Delete session" })
+
 map({ "n" }, "<leader>ff", fzf.files, { desc = "Find files" })
 map({ "n" }, "<leader>fl", fzf.live_grep)
 map({ "n" }, "<leader>fo", fzf.oldfiles)
@@ -359,7 +329,6 @@ map({ "n" }, "<C-q>", ":copen<CR>", { silent = true })
 map({ "n" }, "<C-f>", "<Cmd>silent !xdg-open .<CR>", { desc = "Open current directory in Finder." })
 map({ "n" }, "<leader>a", ":edit #<CR>", { desc = "Switch to the alternate buffer" })
 
-
 map("n", "<C-d>", "<C-d>zz")
 map("n", "<C-u>", "<C-u>zz")
 map("n", "n", "nzzzv")
@@ -372,5 +341,3 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 		vim.cmd([[set filetype=typescriptreact]])
 	end
 })
-
-vim.cmd('colorscheme ' .. default_color)
