@@ -1,4 +1,4 @@
-vim.cmd([[set mouse=]])
+vim.cmd([[set mouse=a]])
 vim.cmd([[set noswapfile]])
 vim.cmd([[hi @lsp.type.number gui=bold]])
 vim.opt.winborder = "single"
@@ -39,6 +39,7 @@ vim.pack.add({
 	{ src = "https://github.com/hat0uma/csvview.nvim" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim" },
+	{ src = "https://github.com/mason-org/mason-lspconfig.nvim" },
 	{ src = "https://github.com/L3MON4D3/LuaSnip" },
 	{ src = "https://github.com/mfussenegger/nvim-dap" },
 	{ src = "https://github.com/rcarriga/nvim-dap-ui" },
@@ -46,7 +47,8 @@ vim.pack.add({
 	{ src = "https://github.com/julianolf/nvim-dap-lldb" },
 	{ src = "https://github.com/nvim-neotest/nvim-nio" },
 	{ src = "https://github.com/saghen/blink.lib" },
-	{ src = "https://github.com/saghen/blink.cmp", version = "main" },
+	{ src = "https://github.com/saghen/blink.cmp",                           version = "main" },
+	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
 
 require("blink.cmp").setup({
@@ -59,6 +61,66 @@ require("blink.cmp").setup({
 		default = { "lsp", "path", "snippets", "buffer" },
 	},
 	fuzzy = { implementation = "lua" },
+})
+
+require('gitsigns').setup({
+	signs = {
+		add          = { text = '+' },
+		change       = { text = '~' },
+		delete       = { text = '_' },
+		topdelete    = { text = '‾' },
+		changedelete = { text = '~' },
+	},
+	-- Enable inline blame
+	current_line_blame = true,
+	current_line_blame_opts = {
+		virt_text = true,
+		virt_text_pos = 'eol', -- Position at the end of the line
+		delay = 250,         -- Delay in milliseconds before blame shows up
+		ignore_whitespace = false,
+	},
+	-- on_attach = function(bufnr)
+	--   local gitsigns = require('gitsigns')
+	--
+	--   local function map(mode, l, r, opts)
+	--     opts = opts or {}
+	--     opts.buffer = bufnr
+	--     vim.keymap.set(mode, l, r, opts)
+	--   end
+	--
+	--   -- Navigation
+	--   map('n', ']c', function()
+	--     if vim.wo.diff then
+	--       vim.cmd.normal({']c', bang = true})
+	--     else
+	--       gitsigns.nav_hunk('next')
+	--     end
+	--   end, { desc = 'Jump to next git hunk' })
+	--
+	--   map('n', '[c', function()
+	--     if vim.wo.diff then
+	--       vim.cmd.normal({'[c', bang = true})
+	--     else
+	--       gitsigns.nav_hunk('prev')
+	--     end
+	--   end, { desc = 'Jump to previous git hunk' })
+	--
+	--   -- Actions
+	--   map('v', '<leader>hs', function() gitsigns.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end, { desc = 'git [s]tage hunk' })
+	--   map('v', '<leader>hr', function() gitsigns.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end, { desc = 'git [r]eset hunk' })
+	--   map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
+	--   map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
+	--   map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
+	--   map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
+	--   map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
+	--   map('n', '<leader>hb', function() gitsigns.blame_line{full=true} end, { desc = 'git [b]lame line' })
+	--   map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff this' })
+	--   map('n', '<leader>hD', function() gitsigns.diffthis('~') end, { desc = 'git [D]iff this ~' })
+	--
+	--   -- Toggles
+	--   map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git line [b]lame' })
+	--   map('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git [w]ord diff' })
+	-- end,
 })
 
 
@@ -128,6 +190,15 @@ vim.api.nvim_create_autocmd('FileType', {
 
 
 require "mason".setup()
+require("mason-lspconfig").setup({
+	ensure_installed = {
+		"cssls", "svelte", "tclint", "rust_analyzer", "clangd", "ruff",
+		"glsl_analyzer", "haskell_language_server", "intelephense",
+		"tailwindcss", "vtsls", "emmet_language_server", "emmet_ls",
+		"solargraph", "zls", "pyright",
+	},
+	automatic_enable = false,
+})
 vim.lsp.config("lua_ls", require("lsp.lua_ls"))
 vim.lsp.config("tinymist", require("lsp.tinymist"))
 vim.lsp.config("ocamllsp", { cmd = { "opam", "exec", "--", "ocamllsp" } })
@@ -151,7 +222,7 @@ vim.lsp.enable({
 	"rust_analyzer", "clangd", "ruff",
 	"ocamllsp",
 	"glsl_analyzer", "haskell-language-server", "hlint",
-	"intelephense", "tailwindcss", "ts_ls",
+	"intelephense", "tailwindcss", "vtsls",
 	"emmet_language_server", "emmet_ls", "solargraph", "zls", "pyright"
 })
 
