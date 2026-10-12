@@ -192,10 +192,10 @@ vim.api.nvim_create_autocmd('FileType', {
 require "mason".setup()
 require("mason-lspconfig").setup({
 	ensure_installed = {
-		"cssls", "svelte", "tclint", "rust_analyzer", "clangd", "ruff",
-		"glsl_analyzer", "haskell_language_server", "intelephense",
+		"cssls", "svelte", "rust_analyzer", "clangd", "ruff",
+		"glsl_analyzer", "intelephense",
 		"tailwindcss", "vtsls", "emmet_language_server", "emmet_ls",
-		"solargraph", "zls", "pyright",
+		"zls", "pyright",
 	},
 	automatic_enable = false,
 })
