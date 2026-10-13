@@ -29,6 +29,7 @@ require("session"):init()
 
 vim.pack.add({
 	{ src = "https://github.com/sainnhe/everforest" },
+	{ src = "https://github.com/vague-theme/vague.nvim" },
 	{ src = "https://github.com/chentoast/marks.nvim" },
 	{ src = "https://github.com/stevearc/oil.nvim" },
 	{ src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -204,7 +205,7 @@ vim.lsp.config("tinymist", require("lsp.tinymist"))
 vim.lsp.config("ocamllsp", { cmd = { "opam", "exec", "--", "ocamllsp" } })
 vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
-local default_color = "everforest"
+local default_color = "vague"
 
 require("fzf-lua").setup {
 	winopts = {
@@ -243,18 +244,32 @@ require("oil").setup({
 })
 
 vim.o.background = "dark"
+
+-- everforest options (applied whenever `:colorscheme everforest` is run)
 vim.g.everforest_background = "medium"
 vim.g.everforest_transparent_background = 2
 vim.g.everforest_better_performance = 1
 vim.g.everforest_enable_italic = 1
+
+-- vague options (applied whenever `:colorscheme vague` is run)
+require("vague").setup({
+	transparent = true,
+})
+
+-- keep floating windows transparent for whichever colorscheme is active
+vim.api.nvim_create_autocmd("ColorScheme", {
+	callback = function()
+		for _, name in ipairs({ "NormalFloat", "FloatBorder", "Pmenu" }) do
+			local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
+			highlight.bg = nil
+			highlight.ctermbg = nil
+			highlight.blend = nil
+			vim.api.nvim_set_hl(0, name, highlight --[[@as vim.api.keyset.highlight]])
+		end
+	end,
+})
+
 vim.cmd.colorscheme(default_color)
-for _, name in ipairs({ "NormalFloat", "FloatBorder", "Pmenu" }) do
-	local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
-	highlight.bg = nil
-	highlight.ctermbg = nil
-	highlight.blend = nil
-	vim.api.nvim_set_hl(0, name, highlight --[[@as vim.api.keyset.highlight]])
-end
 require("statusline").setup()
 require("luasnip").setup({ enable_autosnippets = true })
 require("luasnip.loaders.from_lua").load({ paths = "~/.config/nvim/snippets/" })

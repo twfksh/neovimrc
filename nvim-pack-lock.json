@@ -43,7 +43,7 @@
     },
     "nvim-dap": {
       "rev": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264",
-      "src": "https://codeberg.org/mfussenegger/nvim-dap"
+      "src": "https://github.com/mfussenegger/nvim-dap"
     },
     "nvim-dap-lldb": {
       "rev": "4725dd751ac7403b9f8c748776f7d9555394675d",
@@ -85,6 +85,10 @@
     "typst-preview.nvim": {
       "rev": "1c2e19486397be1c580b560fc50ee36abe329c46",
       "src": "https://github.com/chomosuke/typst-preview.nvim"
+    },
+    "vague.nvim": {
+      "rev": "73f8aaa866bf3d14dd0b0ab9e48c11794c1cb7ab",
+      "src": "https://github.com/vague-theme/vague.nvim"
     }
   }
 }
